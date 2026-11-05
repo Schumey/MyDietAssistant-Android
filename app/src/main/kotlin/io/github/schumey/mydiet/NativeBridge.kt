@@ -19,8 +19,14 @@ import org.json.JSONObject
  * - `summary(json)`: the diary of today hands over its totals; the home screen widget shows them.
  * - `pendingAction()`: "scan" or "add" once, when the app was opened from a widget button.
  */
-class NativeBridge(private val activity: Activity, private val web: WebView, private val health: Health) {
+class NativeBridge(private val activity: Activity, private val web: WebView, private val health: Health, private val updater: Updater) {
     @Volatile var pending: String = ""
+
+    /** "Look for app updates" in the settings: answers with a dialog or a short message of its own. */
+    @JavascriptInterface
+    fun checkUpdate() {
+        activity.runOnUiThread { updater.checkNow() }
+    }
 
     @JavascriptInterface
     fun version(): String = BuildConfig.VERSION_NAME

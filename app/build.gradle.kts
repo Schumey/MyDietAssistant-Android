@@ -11,8 +11,8 @@ android {
         minSdk = 26
         // Sideloaded APK: target 34 keeps the WebView below the system bars (no forced edge-to-edge).
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "0.4.0"
     }
 
     buildFeatures {
@@ -34,4 +34,6 @@ dependencies {
     // Health Connect: read weight, steps and active calories (feature of the web interface, see Health.kt)
     implementation("androidx.health.connect:connect-client:1.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    // FileProvider: hands a downloaded update APK to the package installer
+    implementation("androidx.core:core:1.15.0")
 }

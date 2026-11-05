@@ -95,7 +95,8 @@ class MainActivity : Activity() {
         CookieManager.getInstance().setAcceptThirdPartyCookies(web, false)
         web.addJavascriptInterface(Bridge(), Ingress.BRIDGE)
         health = Health(this, scope)
-        native = NativeBridge(this, web, health)
+        val updater = Updater(this)
+        native = NativeBridge(this, web, health, updater)
         native.pending = intent.getStringExtra(EXTRA_ACTION) ?: ""
         web.addJavascriptInterface(native, NativeBridge.NAME)
         web.webViewClient = Client()
@@ -103,6 +104,7 @@ class MainActivity : Activity() {
         web.setDownloadListener { url, userAgent, disposition, mime, _ -> download(url, userAgent, disposition, mime) }
 
         if (savedInstanceState != null) web.restoreState(savedInstanceState) else web.loadUrl(prefs.baseUrl + "/")
+        updater.checkDaily()
     }
 
     /** Widget buttons while the app is already open (launchMode singleTask). */
