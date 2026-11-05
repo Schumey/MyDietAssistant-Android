@@ -2,6 +2,11 @@
 
 Änderungen an der Android-App. Die HA-App hat ihren eigenen [Changelog](https://github.com/Schumey/MyDietAssistant/blob/main/mydiet/CHANGELOG.md).
 
+## 0.5.1
+
+### Behoben
+- **„Login attempt failed“ in Home Assistant:** Beim erneuten Öffnen der App schickte sie ein abgelaufenes HA-Zugangstoken (gilt 30 Minuten) bis zu 40-mal an HA, das jedes Mal eine fehlgeschlagene Anmeldung meldete. Die App erneuert das Token jetzt vorher selbst und versucht ein abgelehntes Token nie erneut.
+
 ## 0.5.0
 
 ### Neu

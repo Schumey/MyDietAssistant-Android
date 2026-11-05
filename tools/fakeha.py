@@ -7,10 +7,21 @@ app = FastAPI()
 LOG = []
 
 @app.get("/")
-def root():
+def root(expired: int = 0):
+    # ?expired=1 stores an access token that has already run out (like after reopening the app), which the app must renew
+    tok = "{access_token:'old',expires:Date.now()-1000" if expired else "{access_token:'tok',expires:Date.now()+1e6"
     return HTMLResponse("<html><body><h1>FAKE HA</h1><script>"
-        "setTimeout(function(){localStorage.setItem('hassTokens', JSON.stringify({access_token:'tok',expires:Date.now()+1e6}));},1500);"
+        "setTimeout(function(){localStorage.setItem('hassTokens', JSON.stringify(" + tok +
+        ",refresh_token:'ref',clientId:location.origin+'/'}));},1500);"
         "</script></body></html>")
+
+@app.post("/auth/token")
+async def token(request: Request):
+    form = dict(x.split("=", 1) for x in (await request.body()).decode().split("&"))
+    LOG.append({"auth_token": form.get("grant_type")})
+    if form.get("grant_type") != "refresh_token" or form.get("refresh_token") != "ref":
+        return Response('{"error":"invalid_grant"}', status_code=400, media_type="application/json")
+    return {"access_token": "tok", "expires_in": 1800, "token_type": "Bearer"}
 
 # With MDA_UPSTREAM=http://127.0.0.1:8099 the ingress path forwards to a locally running add-on (real interface);
 # without it a placeholder page is served.
@@ -37,6 +48,7 @@ async def ws(w: WebSocket):
     await w.send_json({"type": "auth_required"})
     m = await w.receive_json()
     if m.get("access_token") != "tok":
+        LOG.append({"auth_invalid": m.get("access_token")})   # real HA: "Login attempt failed" notification
         await w.send_json({"type": "auth_invalid"}); return
     await w.send_json({"type": "auth_ok"})
     while True:

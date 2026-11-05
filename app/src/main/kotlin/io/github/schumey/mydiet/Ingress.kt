@@ -19,6 +19,7 @@ object Ingress {
   var slug = ${jsString(slug)};
   var tries = 0;
   function done(u) { window.__mdaBoot = false; $BRIDGE.ingress(u || ""); }
+  var refreshed = false;
   function wait() {
     var t = null;
     try { t = JSON.parse(localStorage.getItem('hassTokens') || 'null'); } catch (e) {}
@@ -26,7 +27,27 @@ object Ingress {
       if (++tries > 40) return done("");
       return setTimeout(wait, 500);
     }
+    // Never send an expired access token: HA counts that as a failed login and shows a "Login attempt failed"
+    // notification. The token lives 30 minutes; nothing renews it on the ingress page, so renew it here.
+    if (!t.expires || t.expires < Date.now() + 30000) return refresh(t);
     attempt(t);
+  }
+  function refresh(t) {
+    if (refreshed || !t.refresh_token) return done("");
+    refreshed = true;
+    var body = 'grant_type=refresh_token&client_id=' + encodeURIComponent(t.clientId || (location.origin + '/')) +
+      '&refresh_token=' + encodeURIComponent(t.refresh_token);
+    fetch('/auth/token', { method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body })
+      .then(function (r) { if (!r.ok) throw new Error('refresh ' + r.status); return r.json(); })
+      .then(function (n) {
+        t.access_token = n.access_token;
+        t.expires_in = n.expires_in;
+        t.expires = Date.now() + n.expires_in * 1000;
+        try { localStorage.setItem('hassTokens', JSON.stringify(t)); } catch (e) {}
+        attempt(t);
+      })
+      .catch(function () { done(""); });
   }
   function attempt(t) {
     var ws, finished = false;
@@ -43,10 +64,9 @@ object Ingress {
       var m = JSON.parse(ev.data);
       if (m.type === 'auth_required') {
         ws.send(JSON.stringify({ type: 'auth', access_token: t.access_token }));
-      } else if (m.type === 'auth_invalid') {   // token expired: the frontend renews it, try again shortly
+      } else if (m.type === 'auth_invalid') {   // revoked or expired after all: renew once, never retry the same token
         finished = true; clearTimeout(timer); try { ws.close(); } catch (e) {}
-        if (++tries > 40) return done("");
-        setTimeout(wait, 1500);
+        refresh(t);
       } else if (m.type === 'auth_ok') {
         ws.send(JSON.stringify({ id: 1, type: 'supervisor/api', endpoint: '/ingress/session', method: 'post' }));
       } else if (m.type === 'result' && m.id === 1) {
