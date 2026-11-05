@@ -2,6 +2,12 @@
 
 Änderungen an der Android-App. Die HA-App hat ihren eigenen [Changelog](https://github.com/Schumey/MyDietAssistant/blob/main/mydiet/CHANGELOG.md).
 
+## 0.4.1
+
+### Geändert
+- Update-Dialog zeigt die Release-Notizen als Text ohne Markdown-Zeichen (nur den deutschen Teil).
+- Nach dem einmaligen „Unbekannte Apps installieren“ startet das Update beim Zurückkehren von selbst, statt dass man erneut auf Installieren tippen muss.
+
 ## 0.4.0
 
 ### Neu

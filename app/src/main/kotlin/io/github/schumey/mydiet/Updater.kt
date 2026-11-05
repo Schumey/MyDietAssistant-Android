@@ -27,6 +27,15 @@ import java.net.URL
  */
 class Updater(private val activity: Activity) {
     private val prefs = activity.getSharedPreferences("updater", Context.MODE_PRIVATE)
+    private var afterPermission: Release? = null   // install as soon as the user comes back from "install unknown apps"
+
+    /** From MainActivity.onResume: continue an install that was waiting for the "install unknown apps" permission. */
+    fun onResume() {
+        val r = afterPermission ?: return
+        if (Build.VERSION.SDK_INT >= 26 && !activity.packageManager.canRequestPackageInstalls()) return
+        afterPermission = null
+        install(r)
+    }
 
     data class Release(val version: String, val notes: String, val apkUrl: String, val page: String)
 
@@ -78,7 +87,10 @@ class Updater(private val activity: Activity) {
     }
 
     private fun offer(r: Release, current: String) {
-        val notes = r.notes.lines().filter { it.isNotBlank() }.take(12).joinToString("\n")
+        // release notes are Markdown: show them as plain text, German part only (above a "---" line)
+        val notes = r.notes.substringBefore("\n---").lines()
+            .map { it.replace("**", "").replace("`", "").replace(Regex("^#+\\s*"), "").replace(Regex("^[-*]\\s+"), "• ") }
+            .filter { it.isNotBlank() }.take(12).joinToString("\n")
         AlertDialog.Builder(activity)
             .setTitle(activity.getString(R.string.update_title, r.version))
             .setMessage(activity.getString(R.string.update_text, current) + if (notes.isNotEmpty()) "\n\n" + notes else "")
@@ -92,6 +104,7 @@ class Updater(private val activity: Activity) {
         if (Build.VERSION.SDK_INT >= 26 && !activity.packageManager.canRequestPackageInstalls()) {
             // Android asks once per app whether it may install other apps; afterwards the user taps "Install" again
             toast(activity.getString(R.string.update_allow))
+            afterPermission = r
             try {
                 activity.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + activity.packageName)))
             } catch (_: Exception) {

@@ -48,6 +48,7 @@ class MainActivity : Activity() {
     private lateinit var errorBox: View
     private lateinit var native: NativeBridge
     private lateinit var health: Health
+    private lateinit var updater: Updater
     private val scope = MainScope()
     private val handler = Handler(Looper.getMainLooper())
 
@@ -95,7 +96,7 @@ class MainActivity : Activity() {
         CookieManager.getInstance().setAcceptThirdPartyCookies(web, false)
         web.addJavascriptInterface(Bridge(), Ingress.BRIDGE)
         health = Health(this, scope)
-        val updater = Updater(this)
+        updater = Updater(this)
         native = NativeBridge(this, web, health, updater)
         native.pending = intent.getStringExtra(EXTRA_ACTION) ?: ""
         web.addJavascriptInterface(native, NativeBridge.NAME)
@@ -123,6 +124,7 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        if (::updater.isInitialized) updater.onResume()
         if (::web.isInitialized) {
             web.onResume()
             handler.removeCallbacks(refreshSession)
