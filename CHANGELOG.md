@@ -2,6 +2,11 @@
 
 Änderungen an der Android-App. Die HA-App hat ihren eigenen [Changelog](https://github.com/Schumey/MyDietAssistant/blob/main/mydiet/CHANGELOG.md).
 
+## 0.5.0
+
+### Neu
+- **Dunkles Design:** Die App folgt dem Hell/Dunkel-Modus von Android. Im dunklen Modus zeigt die Oberfläche ihr dunkles Design (auch die HA-Anmeldung), und Einrichtung, Fehlerseite und Systemleisten sind dunkel. Wechselt man den Modus, während die App offen ist, lädt sie die Seite neu und übernimmt ihn.
+
 ## 0.4.1
 
 ### Geändert

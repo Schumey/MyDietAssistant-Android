@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark mode of the system: dark native screens, dark system bars, and prefers-color-scheme: dark in the WebView. -->
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/mda_background</item>
+        <item name="android:colorBackground">@color/mda_background</item>
+        <item name="android:statusBarColor">@color/mda_background</item>
+        <item name="android:navigationBarColor">@color/mda_background</item>
+    </style>
+</resources>

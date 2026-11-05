@@ -11,8 +11,8 @@ android {
         minSdk = 26
         // Sideloaded APK: target 34 keeps the WebView below the system bars (no forced edge-to-edge).
         targetSdk = 34
-        versionCode = 5
-        versionName = "0.4.1"
+        versionCode = 6
+        versionName = "0.5.0"
     }
 
     buildFeatures {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Light/dark follows the system (values-night/themes.xml). With targetSdk 33+ the WebView sets the page's
+        prefers-color-scheme from this theme's isLightTheme, so the web interface switches to its dark look as well.
+    -->
+    <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/mda_background</item>
+        <item name="android:colorBackground">@color/mda_background</item>
+    </style>
+</resources>

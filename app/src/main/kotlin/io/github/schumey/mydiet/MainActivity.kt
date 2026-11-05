@@ -75,6 +75,7 @@ class MainActivity : Activity() {
         }
 
         web = WebView(this)
+        web.setBackgroundColor(getColor(R.color.mda_background))   // no white flash before the page paints in dark mode
         errorBox = buildErrorBox()
         setContentView(FrameLayout(this).apply {
             addView(web, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -325,7 +326,7 @@ class MainActivity : Activity() {
         return LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
-            setBackgroundColor(0xFFFFFFFF.toInt())
+            setBackgroundColor(getColor(R.color.mda_background))
             setPadding(pad, pad, pad, pad)
             addView(TextView(context).apply { setText(R.string.error_title); textSize = 22f; gravity = Gravity.CENTER })
             addView(TextView(context).apply { setText(R.string.error_text); setPadding(0, pad / 2, 0, pad / 2); gravity = Gravity.CENTER })

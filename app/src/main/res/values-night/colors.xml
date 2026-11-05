@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Same as primary-background-color of the web interface in dark mode (style.css) -->
+    <color name="mda_background">#111111</color>
+</resources>
